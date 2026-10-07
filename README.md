@@ -4,12 +4,18 @@ Builds complete OpenJDK 8u482 Zero runtimes for Android `armeabi-v7a` and
 `arm64-v8a`. The JVM, Java classes, AWT, font manager and native dependencies
 come from the same build. Runtime ZIPs are separate from application APKs.
 
+Experimental ARM32 and ARM64 candidates are available in the
+[Zero 8u482 r1 release](https://github.com/FongMi/bdj-runtime/releases/tag/zero-jdk8u482-r1).
+Both passed standalone JVM, font and BD-J menu checks on an Android API 34
+x86 emulator using its ARM native bridge. See [validation evidence](VALIDATION.md)
+for exact artifact hashes, checks and remaining acceptance requirements.
+
 ## Preserved sources
 
 [`sources.json`](sources.json) pins every input by size and SHA-256. OpenJDK,
 Android compatibility patches, libffi, FreeType, CUPS and DejaVu source archives
-are preserved in this repository's `sources-v1` release. Builds do not clone the
-original Android port or download a Kodi runtime. The independently packaged
+are preserved in the [sources-v1 release](https://github.com/FongMi/bdj-runtime/releases/tag/sources-v1).
+Builds do not clone the original Android port or download a Kodi runtime. The independently packaged
 DejaVu font input is reproducible using `tools/prepare_fonts.py`.
 
 The NDK r10e compiler is a build tool downloaded from Google's official URL,
@@ -50,13 +56,12 @@ AWT JNI initialization exports.
 
 ## Validation boundary
 
-Build success is not Android BD-J acceptance. A candidate requires a fresh
-32-bit or 64-bit application process running JVM/JNI/GC/Java2D/font checks,
-visible menu graphics, directional/select input and close/reopen checks. Actual
-ExoPlayer and mpv menu-to-playback flows need separate application verification.
-ARM64 results do not certify ARM32. Changing to DejaVu also requires menu text
-and layout acceptance. Candidate outputs are marked experimental until these
-checks have run. No third-party ARM32 runtime is mirrored here.
+The published candidates passed independent ARM32 and ARM64 JVM/JNI/GC,
+Java2D, 20 logical font styles, PNG and repeated BD-J menu checks in the
+emulator. They remain experimental pending physical ARM device testing and
+complete ExoPlayer/mpv menu-to-playback verification. DejaVu text and layout
+also need acceptance across real discs. [VALIDATION.md](VALIDATION.md) records
+the tested artifacts and the limits of these results.
 
 ## License
 
@@ -64,3 +69,6 @@ New build utilities and modifications are GPL-2.0-only unless stated otherwise.
 Upstream files retain their individual copyright and license notices. OpenJDK
 Classpath exceptions apply only where granted by the original source. DejaVu
 font files retain their original Bitstream/Arev notices and names.
+Runtime archives include the original OpenJDK documents, dependency notices,
+source manifest and links to the preserved sources and exact build recipe.
+See [source provenance and third-party notices](SOURCE-NOTICE.md).
