@@ -17,11 +17,12 @@ import run_probe
 HASH = "a" * 64
 
 
-def png(value=1):
+def png(value=1, height=1, compressed=None):
     def chunk(kind, payload):
         return struct.pack(">I", len(payload)) + kind + payload + struct.pack(">I", zlib.crc32(kind + payload))
-    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 1, 1, 8, 6, 0, 0, 0))
-            + chunk(b"IDAT", zlib.compress(bytes((0, value, 0, 0, 255)))) + chunk(b"IEND", b""))
+    pixels = zlib.compress(bytes((0, value, 0, 0, 255))) if compressed is None else compressed
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 1, height, 8, 6, 0, 0, 0))
+            + chunk(b"IDAT", pixels) + chunk(b"IEND", b""))
 
 
 class RunProbeTest(unittest.TestCase):
@@ -38,7 +39,8 @@ class RunProbeTest(unittest.TestCase):
             elif args[-1] == "files/result.txt" and "cat" in args:
                 text = ("PASS native BD-J menu pixels, down/right/select, close/reopen; "
                         "menuFrames=8; changedFrames=6; visiblePixelsMin=100" if bdj else
-                        "PASS tag=0; OpenJDK Zero VM; JNI callback, class loading, GC, Java2D, fonts, PNG PASS")
+                        "PASS tag=0; OpenJDK Zero VM; logical font styles 20; "
+                        "JNI callback, class loading, GC, Java2D, fonts, PNG PASS")
                 actual_abi = "arm64-v8a" if fault == "wrong_abi" else abi
                 text += f"; processAbi={actual_abi}; runtimeSha256={HASH}; elapsedMs=100"
             elif args[0] == "exec-out":
@@ -104,16 +106,30 @@ class RunProbeTest(unittest.TestCase):
 
     def test_png_validator_rejects_header_only_truncation_and_bad_crc(self):
         self.assertEqual(run_probe.validate_png(png()), (1, 1))
-        for data in (b"\x89PNG\r\n\x1a\n", png()[:-2], png()[:-1] + b"x"):
+        for data in (b"\x89PNG\r\n\x1a\n", png()[:-2], png()[:-1] + b"x",
+                     png(height=2), png(compressed=b"invalid-deflate")):
             with self.assertRaises(ValueError):
                 run_probe.validate_png(data)
 
     def test_baseline_rejects_missing_font_assertion_and_runtime_mismatch(self):
-        valid = ("PASS OpenJDK Zero VM; JNI callback, class loading, GC, Java2D, fonts, PNG PASS; "
+        valid = ("PASS OpenJDK Zero VM; logical font styles 20; "
+                 "JNI callback, class loading, GC, Java2D, fonts, PNG PASS; "
                  f"processAbi=armeabi-v7a; runtimeSha256={HASH}; elapsedMs=1")
         for result, digest in ((valid.replace("fonts, ", ""), HASH), (valid, "b" * 64)):
             with self.assertRaises(ValueError):
                 run_probe.validate_result(result, "armeabi-v7a", False, digest)
+
+    def test_baseline_rejects_missing_or_incomplete_logical_font_style_matrix(self):
+        valid = ("PASS OpenJDK Zero VM; logical font styles 20; "
+                 "JNI callback, class loading, GC, Java2D, fonts, PNG PASS; "
+                 f"processAbi=armeabi-v7a; runtimeSha256={HASH}; elapsedMs=1")
+        run_probe.validate_result(valid, "armeabi-v7a", False, HASH)
+        results = [valid.replace("; logical font styles 20", "")]
+        results += [valid.replace("logical font styles 20", f"logical font styles {count}")
+                    for count in (0, 19, 21, 200)]
+        for result in results:
+            with self.subTest(result=result), self.assertRaisesRegex(ValueError, "style matrix"):
+                run_probe.validate_result(result, "armeabi-v7a", False, HASH)
 
 
 if __name__ == "__main__":

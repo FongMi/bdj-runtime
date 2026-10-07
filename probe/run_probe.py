@@ -20,7 +20,9 @@ STEPS = ("initial", "key2", "key4", "key5")
 def validate_png(data):
     if not data.startswith(b"\x89PNG\r\n\x1a\n"):
         raise ValueError("Invalid PNG signature")
-    offset, width, height, idat = 8, 0, 0, False
+    offset, width, height = 8, 0, 0
+    compressed = bytearray()
+    row_bytes = 0
     while offset + 12 <= len(data):
         size = struct.unpack_from(">I", data, offset)[0]
         end = offset + 12 + size
@@ -37,11 +39,24 @@ def validate_png(data):
             width, height = struct.unpack_from(">II", payload)
             if width == 0 or height == 0:
                 raise ValueError("Empty PNG dimensions")
+            depth, color, compression, filtering, interlace = payload[8:]
+            channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(color)
+            if channels is None or depth not in (1, 2, 4, 8, 16) or any((compression, filtering, interlace)):
+                raise ValueError("Unsupported PNG encoding")
+            row_bytes = (width * channels * depth + 7) // 8
         if kind == b"IDAT" and payload:
-            idat = True
+            compressed.extend(payload)
         if kind == b"IEND":
-            if size != 0 or end != len(data) or not idat:
+            if size != 0 or end != len(data) or not compressed:
                 raise ValueError("Incomplete PNG image")
+            try:
+                decoded = zlib.decompress(compressed)
+            except zlib.error as error:
+                raise ValueError("Invalid compressed PNG pixels") from error
+            if len(decoded) != height * (row_bytes + 1):
+                raise ValueError("PNG pixel payload does not match its dimensions")
+            if any(decoded[row * (row_bytes + 1)] > 4 for row in range(height)):
+                raise ValueError("Invalid PNG row filter")
             return width, height
         offset = end
     raise ValueError("Missing PNG end")
@@ -65,6 +80,8 @@ def validate_result(result, abi, bdj, runtime_hash):
             raise ValueError("BD-J menu has no visible pixels")
     elif "Zero" not in result or "JNI callback, class loading, GC, Java2D, fonts, PNG PASS" not in result:
         raise ValueError("Zero VM, font, PNG or JNI baseline assertions are missing")
+    elif "; logical font styles 20;" not in result:
+        raise ValueError("Zero baseline logical font style matrix is incomplete")
 
 
 def main():
