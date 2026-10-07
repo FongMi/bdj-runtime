@@ -38,7 +38,10 @@ public final class ProbeActivity extends Activity {
                 }
                 runtimeHash = verifyRuntimeArchive();
                 System.loadLibrary("bdjzeroprobe");
-                File root = new File(getFilesDir(), "candidate");
+                File filesDir = getFilesDir();
+                File anchor = filesDir.getCanonicalFile();
+                Log.i("BdjZero", "Candidate filesDir=" + filesDir + "; canonicalFilesDir=" + anchor);
+                File root = new File(anchor, "candidate");
                 extract(root);
                 File jar = new File(root, "zero-smoke.jar");
                 try (InputStream input = getAssets().open("zero-smoke.jar");
