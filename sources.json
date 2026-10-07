@@ -1,0 +1,85 @@
+{
+  "release": {
+    "repository": "FongMi/bdj-runtime",
+    "tag": "sources-v1"
+  },
+  "sources": {
+    "jdk": {
+      "asset": "jdk8u482-source.zip",
+      "size": 147634351,
+      "sha256": "e12bf7bdd039ec157f770b4f9a17b70cbf8146d895d6e59331f2cf9c4cbfb00a",
+      "format": "zip",
+      "root": "jdk8u-cea3cd4c1d7aa70e998d45ca2e419793a550321e",
+      "upstreamUrl": "https://github.com/openjdk/jdk8u/archive/cea3cd4c1d7aa70e998d45ca2e419793a550321e.zip",
+      "revision": "cea3cd4c1d7aa70e998d45ca2e419793a550321e"
+    },
+    "patches": {
+      "asset": "jdk8u-android-patches.zip",
+      "size": 482133,
+      "sha256": "a8518d22e84a5c42cfc87a0903ad140ef1be4b68db92c6f986ce3ff277c309e4",
+      "format": "zip",
+      "root": "patches",
+      "upstreamUrl": "https://github.com/AngelAuraMC/angelauramc-openjdk-build/tree/f03a5a05d76394bc3e91317e9ff4b8c21e5cb802",
+      "revision": "f03a5a05d76394bc3e91317e9ff4b8c21e5cb802"
+    },
+    "ndk": {
+      "asset": "android-ndk-r10e-linux-x86_64.zip",
+      "size": 1110915721,
+      "sha256": "ee5f405f3b57c4f5c3b3b8b5d495ae12b660e03d2112e4ed5c728d349f1e520c",
+      "format": "zip",
+      "root": "android-ndk-r10e",
+      "upstreamUrl": "https://dl.google.com/android/repository/android-ndk-r10e-linux-x86_64.zip",
+      "version": "r10e",
+      "url": "https://dl.google.com/android/repository/android-ndk-r10e-linux-x86_64.zip"
+    },
+    "freetype": {
+      "asset": "freetype-2.10.4.tar.gz",
+      "size": 3515806,
+      "sha256": "5eab795ebb23ac77001cfb68b7d4d50b5d6c7469247b0b01b2c953269f658dac",
+      "format": "tar",
+      "root": "freetype-2.10.4",
+      "upstreamUrl": "https://download.savannah.gnu.org/releases/freetype/freetype-2.10.4.tar.gz"
+    },
+    "cups": {
+      "asset": "cups-2.2.4-source.tar.gz",
+      "size": 9984475,
+      "sha256": "596d4db72651c335469ae5f37b0da72ac9f97d73e30838d787065f559dea98cc",
+      "format": "tar",
+      "root": "cups-2.2.4",
+      "upstreamUrl": "https://github.com/apple/cups/releases/download/v2.2.4/cups-2.2.4-source.tar.gz"
+    },
+    "libffi": {
+      "asset": "libffi-3.4.8.tar.gz",
+      "size": 1397992,
+      "sha256": "bc9842a18898bfacb0ed1252c4febcc7e78fa139fd27fdc7a3e30d9d9356119b",
+      "format": "tar",
+      "root": "libffi-3.4.8",
+      "upstreamUrl": "https://github.com/libffi/libffi/releases/download/v3.4.8/libffi-3.4.8.tar.gz",
+      "version": "3.4.8"
+    },
+    "fonts": {
+      "asset": "bdj-fonts.zip",
+      "size": 2892849,
+      "sha256": "cdaccd0bb86053304d9ac5cb1dd28a38b47d04e9b40bd35e1af4d319f71b7137",
+      "format": "zip",
+      "root": "jre_override",
+      "upstreamUrl": "generated from preserved DejaVu fonts by tools/prepare_fonts.py"
+    },
+    "dejavu_source": {
+      "asset": "dejavu-fonts-2.37.tar.bz2",
+      "size": 12050109,
+      "sha256": "4b21c5203f792343d5e90ab1cb0cf07e99887218abe3d83cd9a98cea9085e799",
+      "format": "tar",
+      "root": "dejavu-fonts-2.37",
+      "upstreamUrl": "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-2.37.tar.bz2"
+    },
+    "dejavu_ttf": {
+      "asset": "dejavu-fonts-ttf-2.37.tar.bz2",
+      "size": 5429777,
+      "sha256": "fa9ca4d13871dd122f61258a80d01751d603b4d3ee14095d65453b4e846e17d7",
+      "format": "tar",
+      "root": "dejavu-fonts-ttf-2.37",
+      "upstreamUrl": "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-2.37.tar.bz2"
+    }
+  }
+}
