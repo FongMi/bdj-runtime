@@ -125,12 +125,14 @@ extern "C" void bdj_fence() { FULL_MEM_BARRIER; }
             load, store = ("ldrexd", "strexd") if name == "bdj_cas64" else ("ldrex", "strex")
             self.assertRegex(text, rf"\b{load}\b")
             self.assertRegex(text, rf"\b{store}\b")
-            self.assertRegex(text, rf"(?s)\bdmb\s+ish\b.*?\b{load}\b")
-            self.assertRegex(text, rf"(?s)\b{store}\b.*?\bdmb\s+ish\b")
+            # GCC 4.9 emits the full-system SY barrier; Clang uses the narrower
+            # inner-shareable ISH barrier. Both order reads and writes fully.
+            self.assertRegex(text, rf"(?s)\bdmb\s+(?:ish|sy)\b.*?\b{load}\b")
+            self.assertRegex(text, rf"(?s)\b{store}\b.*?\bdmb\s+(?:ish|sy)\b")
         for name in ("bdj_acquire", "bdj_release", "bdj_fence"):
             body = re.search(rf"^{name}:.*?(?=^\s*\.size\s+{name})", assembly, re.M | re.S)
             self.assertIsNotNone(body, name)
-            self.assertRegex(body.group(0), r"\bdmb\s+ish\b")
+            self.assertRegex(body.group(0), r"\bdmb\s+(?:ish|sy)\b")
         source.write_text(
             "#undef __ARM_ARCH\n#define __ARM_ARCH 6\n" + probe, encoding="utf-8"
         )
