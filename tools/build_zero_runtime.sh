@@ -225,6 +225,10 @@ recipe_commit = os.environ.get('GITHUB_SHA') or subprocess.check_output(
     'awtSourceSha256': hashlib.sha256((out / 'AwtInitIDs.c').read_bytes()).hexdigest(),
 }, indent=2) + '\n')
 PY
+cp "$work/artifacts/provenance.json" "$image/provenance.json"
+python3 "$repo_root/tools/prepare_runtime_notices.py" --image "$image" \
+  --repo-root "$repo_root" --libffi-source "$ffi_source" \
+  --freetype-source "$freetype_source" --patches "$patches"
 (
   cd "$(dirname "$image")"
   zip -qr "$work/j2re-zero-$abi-with-symbols.zip" j2re-image
