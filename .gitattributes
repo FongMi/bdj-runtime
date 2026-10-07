@@ -4,4 +4,3 @@
 *.diff text eol=lf
 *.zip -text
 *.ttf -text
-
