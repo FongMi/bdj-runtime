@@ -58,6 +58,9 @@ toolchain="$work/toolchain"
 
 # Set up the pinned NDK directly. The Android port's helper scripts are not
 # needed to construct an OpenJDK devkit or to select the cross compiler.
+# r10e validates ANDROID_NDK_ROOT while sourcing its helpers, before parsing
+# command-line options. Replace the runner's newer NDK with the pinned input.
+export NDK="$ndk" ANDROID_NDK_ROOT="$ndk"
 bash "$ndk/build/tools/make-standalone-toolchain.sh" \
   --arch="$ndk_arch" --platform=android-21 --install-dir="$toolchain"
 cat > "$toolchain/devkit.info.$cpu" <<EOF
